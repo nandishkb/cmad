@@ -12,40 +12,33 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-
+import com.mydomain.db.UserDataDao;
 import com.mydomain.model.Users;
 
 @Path("/user")
 public class UserService {
 
+	private UserDataDao userDao = null;
+	
+	private UserDataDao getUserDataDao() {
+		if (userDao == null) {
+			userDao = UserDataDao.getInstance();
+		}
+		return userDao;
+	}
+
 	@GET
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
 	public Users getUser(@PathParam("param") Integer id) {
-		Session ses = HibernateUtil.currentSession();
-		try {
-			Criteria crit =  ses.createCriteria(Users.class);
-			crit.add(Restrictions.idEq(id));
-			Users u = (Users)crit.uniqueResult();
-			return u;
-		} finally {
-			HibernateUtil.closeSession();
-		}
+		return getUserDataDao().getUser(id);
 	}
 	
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	public List<Users> getUsers() {
-		Session ses = HibernateUtil.currentSession();
-		try {
-			return ses.createCriteria(Users.class).list();
-		} finally {
-			HibernateUtil.closeSession();
-		}
+		System.out.println("UserService.getUsers() getting users = "+userDao);
+		return getUserDataDao().getUsers();
 	}
 	
 	
@@ -53,15 +46,7 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	//public void createUser(@FormParam("name") String name,@FormParam("age") Integer age,@FormParam("emailId") String emailId){
 	public void createUser(Users u){
-		System.out.println("Creating user: "+u.getName()+" Age: "+u.getAge());
-		Session ses = HibernateUtil.currentSession();
-		try {
-			Transaction tx = ses.beginTransaction();
-			ses.save(u);
-			tx.commit();
-		}finally{
-			HibernateUtil.closeSession();
-		}
+		getUserDataDao().addUser(u);
 	}
 	
 	@PUT
@@ -69,32 +54,18 @@ public class UserService {
 	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	//public void updateUser(@FormParam("id") Integer id, @FormParam("name") String name,@FormParam("age") Integer age,@FormParam("emailId") String emailId){
 	public void updateUser(Users u){
-		System.out.println("Updating user: "+u.getName());
-		Session ses = HibernateUtil.currentSession();
-		try {
-			Transaction tx = ses.beginTransaction();
-			ses.update(u);
-			tx.commit();
-		}finally{
-			HibernateUtil.closeSession();
-		}
+		getUserDataDao().updateUser(u);
 	}
 	
 	@DELETE
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
 	public boolean deleteUser(@PathParam("param") Integer id) {
-		System.out.println("Deleting user: "+id);
-		Session ses = HibernateUtil.currentSession();
-		try {
-			Transaction tx = ses.beginTransaction();
-			Users u = (Users) ses.load(Users.class, id);
-			ses.delete(u);
-			tx.commit();
-			return true;
-		} finally {
-			HibernateUtil.closeSession();
-		}
+		return getUserDataDao().deleteUser(id);
+	}
+	
+	public void setUserDataDao(UserDataDao dao) {
+		userDao = dao;
 	}
 	
 }

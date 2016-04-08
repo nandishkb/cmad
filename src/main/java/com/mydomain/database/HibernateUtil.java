@@ -1,4 +1,4 @@
-package com.mydomain.service;
+package com.mydomain.database;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
