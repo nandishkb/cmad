@@ -18,7 +18,7 @@
 	</script>
 </head>
 <body>
-<h2>Hello World!</h2>
+<h2>Hello World! Im a new page</h2>
 
 <div id="templates" style="display:none;">
 	<table>
