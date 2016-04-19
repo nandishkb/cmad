@@ -31,7 +31,6 @@ public class UserService {
 	@Path("/{param}")
 	@Produces({MediaType.APPLICATION_JSON})
 	public Users getUser(@PathParam("param") Integer id) {
-		System.out.println("UserService.getUser()");
 		return getUserDataDao().getUser(id);
 	}
 	
